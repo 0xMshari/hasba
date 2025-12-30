@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>حاسبة التمويل العقاري</title>
+    
+    <link rel="manifest" href="data:application/json;base64,ewogICJuYW1lIjogImhhc2JhIiwKICAic2hvcnRfbmFtZSI6ICJoYXNiYSIsCiAgInN0YXJ0X3VybCI6ICIuIiwKICAiZGlzcGxheSI6ICJzdGFuZGFsb25lIiwKICAiYmFja2dyb3VuZF9jb2xvciI6ICIjZjhmYWZjIiwKICAidGhlbWVfY29sb3IiOiAiIzI1NjNlYiIKfQ==">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = { darkMode: 'class' }
+    </script>
+
+    <style>
+        body { font-family: 'Tajawal', sans-serif; transition: all 0.3s ease; }
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+        .active-tab { background-color: #2563eb !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
+        .input-box { @apply bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700; border-width: 1px; border-radius: 16px; padding: 10px 14px; transition: all 0.2s ease; }
+        .info-card-blue { @apply bg-blue-50 border-blue-100 dark:bg-blue-900/40 dark:border-blue-500/50; }
+        .info-card-blue p:first-child { @apply text-blue-600 dark:text-blue-300; }
+        .info-card-blue p:last-child { @apply text-blue-900 dark:text-white; }
+        @media (max-width: 768px) { .app-wrapper { flex-direction: column-reverse; height: 100dvh; border-radius: 0; } }
+        
+        /* زر التحديث العائم */
+        .refresh-btn { position: fixed; top: 4rem; left: 1rem; z-index: 50; }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col md:justify-center overflow-hidden">
+
+    <div class="fixed top-4 left-4 z-50">
+        <button onclick="toggleDarkMode()" class="p-3 rounded-full bg-white dark:bg-slate-800 shadow-lg border border-slate-200 dark:border-slate-700 transition-all" title="تبديل الوضع">
+            <span id="theme-icon-light" class="hidden dark:block text-yellow-400">☀️</span>
+            <span id="theme-icon-dark" class="block dark:hidden text-slate-700">🌙</span>
+        </button>
+    </div>
+
+    <div class="refresh-btn">
+        <button onclick="recacheApp()" class="p-3 rounded-full bg-emerald-500 text-white shadow-lg transition-all hover:bg-emerald-600 active:scale-95" title="تحديث النسخة">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+            </svg>
+        </button>
+    </div>
+
+    <div class="app-wrapper bg-white dark:bg-slate-900 w-full max-w-6xl md:h-[90vh] md:rounded-[3rem] shadow-2xl overflow-hidden flex self-center mx-auto">
+        
+        <div class="inputs-area w-full md:w-96 bg-slate-50 dark:bg-slate-800/50 border-r border-slate-100 dark:border-slate-800 p-8 flex flex-col justify-center shrink-0">
+            <div class="hidden md:block mb-6">
+                <h1 class="text-2xl font-black text-blue-800 dark:text-blue-400">حاسبة التمويل</h1>
+                <p class="text-xs text-slate-400 font-bold uppercase tracking-widest">نسخة مخزنة دائماً</p>
+            </div>
+
+            <div class="flex gap-2 p-1.5 bg-slate-200 dark:bg-slate-700 rounded-2xl mb-6">
+                <button onclick="setMode('manual')" id="btn-manual" class="flex-1 py-3 text-sm font-black rounded-xl transition-all text-slate-500 dark:text-slate-400">يدوي</button>
+                <button onclick="setMode('offplan')" id="btn-offplan" class="flex-1 py-3 text-sm font-black rounded-xl transition-all text-slate-500 dark:text-slate-400 active-tab">الخارطة</button>
+            </div>
+
+            <div class="space-y-4">
+                <div class="input-box"><label class="text-xs font-bold text-slate-500 dark:text-slate-400 mb-1 block">قيمة العقار</label><input type="text" id="price" value="740,050" oninput="formatInput(this)" class="w-full font-black text-lg outline-none bg-transparent dark:text-white"></div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-box border-orange-100 dark:border-orange-900/50 bg-orange-50/30 dark:bg-orange-950/20"><label class="text-[10px] font-bold text-orange-600 dark:text-orange-400">العربون</label><input type="text" id="earnest" value="15,000" class="w-full font-bold outline-none bg-transparent text-orange-700 dark:text-orange-300" oninput="formatInput(this)"></div>
+                    <div id="down-box" class="input-box"><label class="text-[10px] font-bold text-slate-500 dark:text-slate-400">الدفعة الأولى</label><input type="text" id="down" value="100,000" oninput="formatInput(this)" class="w-full font-bold outline-none bg-transparent dark:text-white"></div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div class="input-box"><label class="text-[10px] font-bold text-slate-500 dark:text-slate-400">السنوات</label><input type="text" id="years" value="15" class="w-full font-bold outline-none bg-transparent text-blue-700 dark:text-blue-400" oninput="formatInput(this)"></div>
+                    <div class="input-box"><label class="text-[10px] font-bold text-slate-500 dark:text-slate-400">الفائدة (%)</label><input type="text" id="rate" value="3.55" oninput="formatInput(this, true)" class="w-full font-bold outline-none bg-transparent dark:text-white"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="results-area flex-1 p-6 md:p-12 bg-white dark:bg-slate-900 flex flex-col justify-around">
+            <div class="text-center md:text-right">
+                <span class="inline-block text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 dark:text-blue-300 px-4 py-1.5 rounded-full mb-1">القسط الشهري</span>
+                <div class="flex items-baseline justify-center md:justify-start gap-1">
+                    <span id="monthly" class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter"></span>
+                    <span class="text-lg md:text-2xl text-slate-400 dark:text-slate-500 font-bold">ريال</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                <div class="p-4 md:p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <p class="text-slate-400 text-[9px] md:text-xs font-bold mb-1 uppercase">صافي التمويل</p>
+                    <p class="text-lg md:text-2xl font-black text-slate-800 dark:text-slate-100" id="loan"></p>
+                </div>
+                <div class="p-4 md:p-6 info-card-blue rounded-2xl border">
+                    <p class="text-blue-600 dark:text-blue-400 text-[9px] md:text-xs font-bold mb-1">فائدة أول 3 أشهر</p>
+                    <p class="text-lg md:text-2xl font-black text-blue-900 dark:text-blue-100" id="threeMonthsInfo"></p>
+                </div>
+                <div class="p-4 md:p-6 bg-emerald-50 dark:bg-emerald-900/20 border-emerald-100 dark:border-emerald-800 rounded-2xl border">
+                    <p class="text-emerald-600 dark:text-emerald-400 text-[9px] md:text-xs font-bold mb-1">مدفوع أول سنتين</p>
+                    <p class="text-lg md:text-2xl font-black text-emerald-900 dark:text-emerald-100" id="twoYearsPaid"></p>
+                </div>
+                <div class="p-4 md:p-6 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800">
+                    <p class="text-slate-400 text-[9px] md:text-xs font-bold mb-1 uppercase">إجمالي الفوائد</p>
+                    <p class="text-lg md:text-2xl font-black text-slate-800 dark:text-slate-100" id="interest"></p>
+                </div>
+                <div class="p-4 md:p-6 bg-blue-900 dark:bg-blue rounded-2xl text-white shadow-xl col-span-2 lg:col-span-2">
+                    <p class="text-slate-400 text-[9px] md:text-xs font-bold mb-1 uppercase tracking-widest">إجمالي المبلغ النهائي</p>
+                    <p class="text-xl md:text-3xl font-black" id="total"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- Service Worker Logic (Cache-First) ---
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                const swCode = `
+                    const CACHE_NAME = 'hasba-cache-v3';
+                    const ASSETS = [
+                        location.href,
+                        'https://cdn.tailwindcss.com',
+                        'https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap'
+                    ];
+
+                    // عند التثبيت: تخزين الملفات فوراً
+                    self.addEventListener('install', e => {
+                        e.waitUntil(
+                            caches.open(CACHE_NAME).then(cache => cache.addAll(ASSETS))
+                        );
+                        self.skipWaiting();
+                    });
+
+                    // استراتيجية: البحث في الكاش أولاً (حتى لو كان متصلاً)
+                    self.addEventListener('fetch', e => {
+                        e.respondWith(
+                            caches.match(e.request).then(response => {
+                                return response || fetch(e.request);
+                            })
+                        );
+                    });
+                `;
+                const blob = new Blob([swCode], { type: 'text/javascript' });
+                navigator.serviceWorker.register(URL.createObjectURL(blob));
+            });
+        }
+
+        // دالة إجبارية لمسح الكاش وإعادة التحميل
+        async function recacheApp() {
+            if (confirm('هل تريد تحديث التطبيق لجلب أحدث التغييرات؟')) {
+                const names = await caches.keys();
+                await Promise.all(names.map(name => caches.delete(name)));
+                location.reload(true);
+            }
+        }
+
+        // --- Ad Cleaner (Tiiny Host) ---
+        window.addEventListener('load', () => {
+            const clean = () => document.querySelector('a[href*="tiiny.host"]')?.closest('div[style*="position: fixed"]')?.remove();
+            clean(); setInterval(clean, 1000);
+        });
+
+        // --- Core Calculator Logic ---
+        const offPlanRates = { 1: 3.34, 5: 3.44, 10: 3.46, 15: 3.54, 20: 3.95, 25: 4.22, 30: 4.35 };
+        let currentMode = 'manual';
+
+        function toggleDarkMode() {
+            document.documentElement.classList.toggle('dark');
+            localStorage.setItem('theme', document.documentElement.classList.contains('dark') ? 'dark' : 'light');
+        }
+
+        if (localStorage.getItem('theme') === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+        }
+
+        function formatInput(el, isFloat = false) {
+            let clean = isFloat ? /[^\d.]/g : /[^\d]/g;
+            let val = el.value.replace(clean, '');
+            if (isFloat && val.split('.').length > 2) val = val.substring(0, val.lastIndexOf('.'));
+            if (val === "") { el.value = ""; calculate(); return; }
+            if (!isFloat) el.value = Number(val).toLocaleString('en-US');
+            else { if (val.endsWith('.')) return; let p = val.split('.'); p[0] = Number(p[0]).toLocaleString('en-US'); el.value = p.length > 1 ? p[0] + '.' + p[1].substring(0, 2) : p[0]; }
+            calculate();
+        }
+
+        function getCleanVal(id) { return Number(document.getElementById(id).value.replace(/,/g, '')) || 0; }
+
+        function setMode(mode) {
+            currentMode = mode;
+            const rateInput = document.getElementById('rate');
+            const btns = { man: document.getElementById('btn-manual'), off: document.getElementById('btn-offplan') };
+            rateInput.readOnly = mode === 'offplan';
+            btns.off.classList.toggle('active-tab', mode === 'offplan');
+            btns.man.classList.toggle('active-tab', mode === 'manual');
+            calculate();
+        }
+
+        function calculate() {
+            const p = getCleanVal('price'), d = getCleanVal('down'), e = getCleanVal('earnest'), y = getCleanVal('years');
+            const rateInput = document.getElementById('rate');
+            if (currentMode === 'offplan') {
+                const keys = Object.keys(offPlanRates).map(Number).sort((a,b)=>a-b);
+                let r = offPlanRates[30];
+                for(let k of keys) { if(y <= k) { r = offPlanRates[k]; break; } }
+                rateInput.value = r;
+            }
+            document.getElementById('down-box').classList.toggle('border-red-500', d < (p * 0.1) && p > 0);
+            
+            const rateValue = (Number(rateInput.value.replace(/,/g, '')) || 0) / 100;
+            const loanAmount = p - d - e;
+            const totalInterest = loanAmount * rateValue * y;
+            const totalMonths = y * 12;
+            const finalTotal = loanAmount + totalInterest;
+            const monthlyPayment = totalMonths > 0 ? finalTotal / totalMonths : 0;
+            
+            const fmt = (n) => Math.max(0, n).toLocaleString('en-US', { maximumFractionDigits: 0 });
+            
+            document.getElementById('loan').innerText = fmt(loanAmount);
+            document.getElementById('interest').innerText = fmt(totalInterest);
+            document.getElementById('threeMonthsInfo').innerText = fmt(totalMonths > 0 ? (totalInterest / totalMonths) * 3 : 0);
+            document.getElementById('total').innerText = fmt(finalTotal);
+            document.getElementById('monthly').innerText = fmt(monthlyPayment);
+            document.getElementById('twoYearsPaid').innerText = fmt(monthlyPayment * 24);
+        }
+        setMode('manual');
+    </script>
+</body>
+</html>
