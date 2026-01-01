@@ -120,23 +120,33 @@
     </div>
 
     <script>
-        const apartments = [
-            {id: "A30", sec: "A", price: 1097000}, {id: "A27", sec: "A", price: 909000}, {id: "A23", sec: "A", price: 809000},
-            {id: "A21", sec: "A", price: 979000}, {id: "A28", sec: "A", price: 839000}, {id: "A11", sec: "A", price: 929000},
-            {id: "A22", sec: "A", price: 929000}, {id: "A12", sec: "A", price: 859000}, {id: "A25", sec: "A", price: 897000},
-            {id: "A24", sec: "A", price: 869000}, {id: "A26", sec: "A", price: 839000}, {id: "A13", sec: "A", price: 809000},
-            {id: "A15", sec: "A", price: 789000}, {id: "A20", sec: "A", price: 819000}, {id: "A14", sec: "A", price: 779000},
-            {id: "A18", sec: "A", price: 739000}, {id: "A19", sec: "A", price: 739000},
-            {id: "B28", sec: "B", price: 869000}, {id: "B21", sec: "B", price: 869000}, {id: "B18", sec: "B", price: 919000},
-            {id: "B20", sec: "B", price: 929000}, {id: "B22", sec: "B", price: 929000}, {id: "B19", sec: "B", price: 939000},
-            {id: "B24", sec: "B", price: 979000}, {id: "B23", sec: "B", price: 989000}, {id: "B11", sec: "B", price: 819000},
-            {id: "B25", sec: "B", price: 849000}, {id: "B16", sec: "B", price: 779000}, {id: "B17", sec: "B", price: 779000},
-            {id: "C19", sec: "C", price: 739000}, {id: "C18", sec: "C", price: 749000}, {id: "C15", sec: "C", price: 779000},
-            {id: "C20", sec: "C", price: 749000}, {id: "C24", sec: "C", price: 749000}, {id: "C14", sec: "C", price: 779000},
-            {id: "C12", sec: "C", price: 929000}, {id: "C13", sec: "C", price: 929000}, {id: "C21", sec: "C", price: 929000},
-            {id: "C23", sec: "C", price: 929000}, {id: "C25", sec: "C", price: 979000}, {id: "C22", sec: "C", price: 989000},
-            {id: "C10", sec: "C", price: 1197000}, {id: "C11", sec: "C", price: 1197000}
-        ];
+const apartments = [
+    // Section A - All set to booked
+    {id: "A11", sec: "A", price: 929000, booked: true}, {id: "A12", sec: "A", price: 859000, booked: true}, 
+    {id: "A13", sec: "A", price: 809000, booked: true}, {id: "A14", sec: "A", price: 779000, booked: true},
+    {id: "A15", sec: "A", price: 789000, booked: true}, {id: "A18", sec: "A", price: 739000, booked: true}, 
+    {id: "A19", sec: "A", price: 739000, booked: true}, {id: "A20", sec: "A", price: 819000, booked: true},
+    {id: "A21", sec: "A", price: 979000, booked: true}, {id: "A22", sec: "A", price: 929000, booked: true}, 
+    {id: "A23", sec: "A", price: 809000, booked: true}, {id: "A24", sec: "A", price: 869000, booked: true},
+    {id: "A25", sec: "A", price: 897000, booked: true}, {id: "A26", sec: "A", price: 839000, booked: true}, 
+    {id: "A27", sec: "A", price: 909000, booked: true}, {id: "A28", sec: "A", price: 839000, booked: true},
+    {id: "A30", sec: "A", price: 1097000, booked: true},
+
+    // Section B
+    {id: "B11", sec: "B", price: 819000}, {id: "B16", sec: "B", price: 779000}, {id: "B17", sec: "B", price: 779000},
+    {id: "B18", sec: "B", price: 919000}, {id: "B19", sec: "B", price: 939000}, {id: "B20", sec: "B", price: 929000},
+    {id: "B21", sec: "B", price: 869000}, {id: "B22", sec: "B", price: 929000}, {id: "B23", sec: "B", price: 989000},
+    {id: "B24", sec: "B", price: 979000}, {id: "B25", sec: "B", price: 849000}, {id: "B28", sec: "B", price: 869000},
+
+    // Section C - Specific units booked
+    {id: "C10", sec: "C", price: 1197000, booked: true}, {id: "C11", sec: "C", price: 1197000, booked: true}, 
+    {id: "C12", sec: "C", price: 929000, booked: true}, {id: "C13", sec: "C", price: 929000}, 
+    {id: "C14", sec: "C", price: 779000}, {id: "C15", sec: "C", price: 779000, booked: true}, 
+    {id: "C18", sec: "C", price: 749000}, {id: "C19", sec: "C", price: 739000, booked: true},
+    {id: "C20", sec: "C", price: 749000, booked: true}, {id: "C21", sec: "C", price: 929000}, 
+    {id: "C22", sec: "C", price: 989000}, {id: "C23", sec: "C", price: 929000}, 
+    {id: "C24", sec: "C", price: 749000}, {id: "C25", sec: "C", price: 979000},
+];
 
         apartments.sort((a, b) => a.id.localeCompare(b.id, undefined, { numeric: true }));
 
@@ -163,17 +173,27 @@
             calculate();
         }
 
-        function updateAptList() {
-            const sec = document.getElementById('apt-section').value;
-            const unitSelect = document.getElementById('apt-unit');
-            unitSelect.innerHTML = '<option value="">الوحدة</option>';
-            apartments.filter(a => a.sec === sec).forEach(a => {
-                const opt = document.createElement('option');
-                opt.value = a.price;
-                opt.text = `${a.id} - (${a.price.toLocaleString()})`;
-                unitSelect.add(opt);
-            });
+function updateAptList() {
+    const sec = document.getElementById('apt-section').value;
+    const unitSelect = document.getElementById('apt-unit');
+    unitSelect.innerHTML = '<option value="">الوحدة</option>';
+    
+    apartments.filter(a => a.sec === sec).forEach(a => {
+        const opt = document.createElement('option');
+        opt.value = a.price;
+        
+        // Add indicator if booked
+        const status = a.booked ? " (محجوزة 🔴)" : "";
+        opt.text = `${a.id} - (${a.price.toLocaleString()})${status}`;
+        
+        // Optional: change style for booked units (some browsers allow this)
+        if (a.booked) {
+            opt.classList.add('text-red-500');
         }
+        
+        unitSelect.add(opt);
+    });
+}
 
         function applyAptPrice() {
             const price = document.getElementById('apt-unit').value;
@@ -200,7 +220,7 @@
             calculate();
         }
 
-        function autoSetDown(type) {
+function autoSetDown(type) {
             const price = getCleanVal('price');
             const downInput = document.getElementById('down');
             const btn10 = document.getElementById('btn-down-10');
@@ -208,24 +228,40 @@
 
             if (type === '10%') {
                 downInput.value = (price * 0.1).toLocaleString();
-                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-active";
-                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
-            } else {
+                // تحديث شكل الأزرار
+                btn10.classList.replace('btn-inactive', 'btn-active');
+                btn100k.classList.replace('btn-active', 'btn-inactive');
+            } else if (type === '100k') {
                 downInput.value = (100000).toLocaleString();
-                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
-                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-active";
+                // تحديث شكل الأزرار
+                btn100k.classList.replace('btn-inactive', 'btn-active');
+                btn10.classList.replace('btn-active', 'btn-inactive');
             }
             calculate();
         }
 
+        // وظيفة مسح التحديد عن الأزرار عند الإدخال اليدوي
         function clearDownButtons() {
-            document.getElementById('btn-down-10').className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
-            document.getElementById('btn-down-100k').className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
+            const btn10 = document.getElementById('btn-down-10');
+            const btn100k = document.getElementById('btn-down-100k');
+            
+            btn10.classList.replace('btn-active', 'btn-inactive');
+            btn100k.classList.replace('btn-active', 'btn-inactive');
         }
 
+        // تحديث وظيفة تنسيق المدخلات لتقبل مسح التحديد
         function formatInput(el, isFloat = false) {
+            // إذا كان المستخدم يعدل خانة الدفعة، نمسح تحديد الأزرار
+            if (el.id === 'down') {
+                clearDownButtons();
+            }
+
             let val = el.value.replace(isFloat ? /[^\d.]/g : /[^\d]/g, '');
-            if (val === "") { el.value = ""; calculate(); return; }
+            if (val === "") { 
+                el.value = ""; 
+                calculate(); 
+                return; 
+            }
             if (!isFloat) el.value = Number(val).toLocaleString('en-US');
             calculate();
         }
