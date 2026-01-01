@@ -3,45 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>حاسبة التمويل العقاري المطورة</title>
-    
+    <title>حاسبة التمويل العقاري</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;900&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = { darkMode: 'class' }
-    </script>
-
+    <script>tailwind.config = { darkMode: 'class' }</script>
     <style>
-        body { font-family: 'Tajawal', sans-serif; transition: all 0.3s ease; }
+        body { font-family: 'Tajawal', sans-serif; transition: all 0.3s ease; touch-action: manipulation; }
         input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
-        .active-tab { background-color: #2563eb !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
-        .input-box { @apply bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700; border-width: 1px; border-radius: 16px; padding: 10px 14px; transition: all 0.2s ease; }
-        .info-card-blue { @apply bg-blue-50 border-blue-100 dark:bg-blue-900/40 dark:border-blue-500/50; }
-        .btn-inactive { @apply bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300; }
-        .btn-active { @apply bg-blue-600 text-white shadow-md; }
-        @media (max-width: 768px) { .app-wrapper { flex-direction: column-reverse; height: auto; border-radius: 0; } }
+        .active-tab { background-color: #2563eb !important; color: #ffffff !important; }
+        .input-box { @apply bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700; border-width: 1px; border-radius: 12px; padding: 6px 10px; transition: all 0.2s ease; }
+        /* تحسين شكل الزر المختار */
+        .btn-active { @apply bg-blue-600 text-white border-blue-600 shadow-md ring-2 ring-blue-100 dark:ring-blue-900; }
+        .btn-inactive { @apply bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 border-transparent hover:bg-slate-200; }
+        @media (max-width: 768px) { .app-wrapper { border-radius: 0; } }
     </style>
 </head>
-<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex flex-col md:justify-center p-4">
+<body class="bg-slate-50 dark:bg-slate-950 min-h-screen flex items-center justify-center p-0 md:p-4">
 
-    <div class="app-wrapper bg-white dark:bg-slate-900 w-full max-w-6xl md:rounded-[3rem] shadow-2xl overflow-hidden flex self-center mx-auto">
+    <div class="app-wrapper bg-white dark:bg-slate-900 w-full max-w-5xl md:rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col md:flex-row">
         
-        <div class="inputs-area w-full md:w-[450px] bg-slate-50 dark:bg-slate-800/50 border-r border-slate-100 dark:border-slate-800 p-6 flex flex-col justify-start shrink-0">
-            <h1 class="text-xl font-black text-blue-800 dark:text-blue-400 mb-4">حاسبة التمويل العقاري</h1>
+        <div class="inputs-area w-full md:w-[400px] bg-slate-50/50 dark:bg-slate-800/30 border-l border-slate-100 dark:border-slate-800 p-5 md:p-8 shrink-0">
+            <h1 class="text-xl font-black text-blue-800 dark:text-blue-400 mb-6">حاسبة التمويل</h1>
 
-            <div class="flex gap-1 p-1 bg-slate-200 dark:bg-slate-700 rounded-2xl mb-6">
-                <button onclick="setMode('manual')" id="btn-manual" class="flex-1 py-2 text-xs font-black rounded-xl transition-all">يدوي</button>
-                <button onclick="setMode('offplan')" id="btn-offplan" class="flex-1 py-2 text-xs font-black rounded-xl transition-all">الخارطة</button>
-                <button onclick="setMode('apartment')" id="btn-apartment" class="flex-1 py-2 text-xs font-black rounded-xl transition-all">الشقق</button>
+            <div class="flex gap-1 p-1 bg-slate-200 dark:bg-slate-700 rounded-xl mb-6">
+                <button onclick="setMode('manual')" id="btn-manual" class="flex-1 py-2 text-xs font-black rounded-lg transition-all">يدوي</button>
+                <button onclick="setMode('offplan')" id="btn-offplan" class="flex-1 py-2 text-xs font-black rounded-lg transition-all">الخارطة</button>
+                <button onclick="setMode('apartment')" id="btn-apartment" class="flex-1 py-2 text-xs font-black rounded-lg transition-all">الشقق</button>
             </div>
 
             <div class="space-y-4">
-                <div id="apartment-options" class="hidden space-y-4 animate-in fade-in duration-300">
+                <div id="apartment-options" class="hidden space-y-4">
                     <div class="grid grid-cols-2 gap-2">
                         <div class="input-box">
-                            <label class="text-[10px] font-bold text-slate-500">القسم</label>
-                            <select id="apt-section" onchange="updateAptList()" class="w-full bg-transparent outline-none font-bold dark:text-white">
+                            <label class="text-[10px] font-bold text-slate-500 block">القسم</label>
+                            <select id="apt-section" onchange="updateAptList()" class="w-full bg-transparent outline-none font-bold text-sm dark:text-white">
                                 <option value="">اختر</option>
                                 <option value="A">القسم A</option>
                                 <option value="B">القسم B</option>
@@ -49,77 +44,76 @@
                             </select>
                         </div>
                         <div class="input-box">
-                            <label class="text-[10px] font-bold text-slate-500">رقم الوحدة</label>
-                            <select id="apt-unit" onchange="applyAptPrice()" class="w-full bg-transparent outline-none font-bold dark:text-white">
+                            <label class="text-[10px] font-bold text-slate-500 block">الوحدة</label>
+                            <select id="apt-unit" onchange="applyAptPrice()" class="w-full bg-transparent outline-none font-bold text-sm dark:text-white">
                                 <option value="">اختر القسم</option>
                             </select>
                         </div>
                     </div>
-
                     <div class="flex gap-2">
-                        <button onclick="autoSetDown('10%')" id="btn-down-10" class="flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive">دفعة 10%</button>
-                        <button onclick="autoSetDown('100k')" id="btn-down-100k" class="flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive">100 ألف دفعة</button>
+                        <button onclick="autoSetDown('10%')" id="btn-down-10" class="flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive">دفعة 10%</button>
+                        <button onclick="autoSetDown('100k')" id="btn-down-100k" class="flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive">100 ألف</button>
                     </div>
                 </div>
 
                 <div class="space-y-1">
-                    <label class="text-xs font-bold text-slate-500 mb-1 block" id="price-label">قيمة العقار</label>
+                    <label class="text-[10px] font-bold text-slate-500 block" id="price-label">قيمة العقار</label>
                     <div class="flex gap-2 items-center">
                         <div class="input-box flex-1">
-                            <input type="text" id="price" oninput="formatInput(this); clearAptButtons();" class="w-full font-black text-lg outline-none bg-transparent dark:text-white">
+                            <input type="text" id="price" oninput="formatInput(this);" class="w-full font-black text-lg outline-none bg-transparent dark:text-white">
                         </div>
-                        <div id="ratio-selector" class="hidden flex flex-col gap-1 shrink-0 animate-in zoom-in duration-200">
-                            <button onclick="setDiscount(1)" id="ltv-100" class="px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white transition-all">100%</button>
-                            <button onclick="setDiscount(0.95)" id="ltv-95" class="px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white transition-all">95%</button>
+                        <div id="ratio-selector" class="hidden flex flex-col gap-1 shrink-0">
+                            <button onclick="setDiscount(1)" id="ltv-100" class="px-3 py-1 text-[10px] font-black rounded-md border border-slate-200 dark:text-white">100%</button>
+                            <button onclick="setDiscount(0.95)" id="ltv-95" class="px-3 py-1 text-[10px] font-black rounded-md border border-slate-200 dark:text-white">95%</button>
                         </div>
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div class="input-box border-orange-100 bg-orange-50/30">
-                        <label class="text-[10px] font-bold text-orange-600">العربون</label>
-                        <input type="text" id="earnest" value="15,000" class="w-full font-bold outline-none bg-transparent text-orange-700" oninput="formatInput(this)">
+                        <label class="text-[10px] font-bold text-orange-600 block">العربون</label>
+                        <input type="text" id="earnest" value="15,000" class="w-full font-bold text-md outline-none bg-transparent text-orange-700" oninput="formatInput(this)">
                     </div>
-                    <div id="down-box" class="input-box">
-                        <label class="text-[10px] font-bold text-slate-500">الدفعة الأولى</label>
-                        <input type="text" id="down" value="0" oninput="formatInput(this); clearDownButtons();" class="w-full font-bold outline-none bg-transparent dark:text-white">
+                    <div class="input-box">
+                        <label class="text-[10px] font-bold text-slate-500 block">الدفعة</label>
+                        <input type="text" id="down" value="0" oninput="formatInput(this); clearDownButtons();" class="w-full font-bold text-md outline-none bg-transparent dark:text-white">
                     </div>
                 </div>
 
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-3">
                     <div class="input-box">
-                        <label class="text-[10px] font-bold text-slate-500">السنوات</label>
-                        <input type="text" id="years" value="15" class="w-full font-bold outline-none bg-transparent text-blue-700" oninput="formatInput(this)">
+                        <label class="text-[10px] font-bold text-slate-500 block">السنوات</label>
+                        <input type="text" id="years" value="15" class="w-full font-bold text-md outline-none bg-transparent text-blue-700" oninput="formatInput(this)">
                     </div>
                     <div class="input-box">
-                        <label class="text-[10px] font-bold text-slate-500">الفائدة (%)</label>
-                        <input type="text" id="rate" value="3.55" oninput="formatInput(this, true)" class="w-full font-bold outline-none bg-transparent dark:text-white">
+                        <label class="text-[10px] font-bold text-slate-500 block">الفائدة (%)</label>
+                        <input type="text" id="rate" value="3.55" oninput="formatInput(this, true)" class="w-full font-bold text-md outline-none bg-transparent dark:text-white">
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="results-area flex-1 p-8 bg-white dark:bg-slate-900 flex flex-col justify-center">
+        <div class="results-area flex-1 p-6 md:p-12 bg-white dark:bg-slate-900 flex flex-col justify-center border-t md:border-t-0 md:border-r border-slate-100 dark:border-slate-800">
             <div class="mb-10 text-center md:text-right">
-                <span class="inline-block text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full mb-2">القسط الشهري التقريبي</span>
+                <span class="inline-block text-[11px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full mb-3 uppercase tracking-wider">القسط الشهري التقريبي</span>
                 <div class="flex items-baseline justify-center md:justify-start gap-2">
-                    <span id="monthly" class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter">0</span>
+                    <span id="monthly" class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter transition-all">0</span>
                     <span class="text-xl text-slate-400 font-bold">ريال</span>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl">
+            <div class="grid grid-cols-2 gap-3">
+                <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-700">
                     <p class="text-slate-400 text-[10px] font-bold mb-1 uppercase">صافي التمويل</p>
-                    <p class="text-xl font-black text-slate-800 dark:text-slate-100" id="loan">0</p>
+                    <p class="text-2xl font-black text-slate-800 dark:text-slate-100" id="loan">0</p>
                 </div>
-                <div class="p-4 info-card-blue rounded-2xl">
-                    <p class="text-blue-600 dark:text-blue-400 text-[10px] font-bold mb-1">إجمالي الفوائد</p>
-                    <p class="text-xl font-black text-blue-900 dark:text-blue-100" id="interest">0</p>
+                <div class="p-4 bg-blue-50/50 dark:bg-blue-900/20 rounded-2xl border border-blue-100/50 dark:border-blue-800">
+                    <p class="text-blue-600 dark:text-blue-400 text-[10px] font-bold mb-1 uppercase">إجمالي الفوائد</p>
+                    <p class="text-2xl font-black text-blue-900 dark:text-blue-100" id="interest">0</p>
                 </div>
-                <div class="p-6 bg-blue-900 rounded-2xl text-white col-span-2 shadow-xl">
-                    <p class="text-blue-300 text-[10px] font-bold mb-1 uppercase">إجمالي المديونية</p>
-                    <p class="text-3xl font-black" id="total">0</p>
+                <div class="p-6 bg-blue-600 dark:bg-blue-700 rounded-3xl text-white col-span-2 shadow-xl shadow-blue-200 dark:shadow-none mt-2">
+                    <p class="text-blue-100 text-[10px] font-bold mb-1 uppercase opacity-80">إجمالي المديونية (القيمة الكلية)</p>
+                    <p class="text-4xl font-black" id="total">0</p>
                 </div>
             </div>
         </div>
@@ -152,30 +146,18 @@
 
         function setMode(mode) {
             currentMode = mode;
-            const aptOpt = document.getElementById('apartment-options');
-            const ratioDiv = document.getElementById('ratio-selector');
-            const rateInput = document.getElementById('rate');
-            const yearsInput = document.getElementById('years');
-            const priceLabel = document.getElementById('price-label');
-            
-            aptOpt.classList.toggle('hidden', mode !== 'apartment');
-            ratioDiv.classList.toggle('hidden', mode !== 'apartment');
-            priceLabel.innerText = mode === 'apartment' ? 'قيمة العقار (بعد الخصم إن وجد)' : 'قيمة العقار';
+            document.getElementById('apartment-options').classList.toggle('hidden', mode !== 'apartment');
+            document.getElementById('ratio-selector').classList.toggle('hidden', mode !== 'apartment');
+            document.getElementById('price-label').innerText = mode === 'apartment' ? 'قيمة العقار (بعد الخصم)' : 'قيمة العقار';
 
             ['manual', 'offplan', 'apartment'].forEach(m => {
                 document.getElementById(`btn-${m}`).classList.toggle('active-tab', mode === m);
             });
 
             if (mode === 'apartment') {
-                rateInput.value = "3.75";
-                yearsInput.value = "20";
-                rateInput.readOnly = true;
-                yearsInput.readOnly = true;
+                document.getElementById('rate').value = "3.75";
+                document.getElementById('years').value = "20";
                 setDiscount(1);
-            } else {
-                rateInput.readOnly = false;
-                yearsInput.readOnly = false;
-                currentDiscount = 1;
             }
             clearDownButtons();
             calculate();
@@ -184,11 +166,11 @@
         function updateAptList() {
             const sec = document.getElementById('apt-section').value;
             const unitSelect = document.getElementById('apt-unit');
-            unitSelect.innerHTML = '<option value="">اختر الوحدة</option>';
+            unitSelect.innerHTML = '<option value="">الوحدة</option>';
             apartments.filter(a => a.sec === sec).forEach(a => {
                 const opt = document.createElement('option');
                 opt.value = a.price;
-                opt.text = `${a.id} - (${a.price.toLocaleString()} ر.س)`;
+                opt.text = `${a.id} - (${a.price.toLocaleString()})`;
                 unitSelect.add(opt);
             });
         }
@@ -203,20 +185,15 @@
 
         function setDiscount(factor) {
             currentDiscount = factor;
-            document.getElementById('ltv-100').className = factor === 1 ? 'px-3 py-1.5 text-[10px] font-black rounded-lg bg-blue-600 text-white transition-all' : 'px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white transition-all';
-            document.getElementById('ltv-95').className = factor === 0.95 ? 'px-3 py-1.5 text-[10px] font-black rounded-lg bg-blue-600 text-white transition-all' : 'px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white transition-all';
+            document.getElementById('ltv-100').className = factor === 1 ? 'px-3 py-1 text-[10px] font-black rounded-md bg-blue-600 text-white shadow-sm' : 'px-3 py-1 text-[10px] font-black rounded-md border border-slate-200 dark:text-white';
+            document.getElementById('ltv-95').className = factor === 0.95 ? 'px-3 py-1 text-[10px] font-black rounded-md bg-blue-600 text-white shadow-sm' : 'px-3 py-1 text-[10px] font-black rounded-md border border-slate-200 dark:text-white';
             
-            if (currentMode === 'apartment' && baseAptPrice > 0) {
-                updatePriceField();
-            } else {
-                calculate();
-            }
+            if (baseAptPrice > 0) updatePriceField();
         }
 
         function updatePriceField() {
             const discountedPrice = baseAptPrice * currentDiscount;
             document.getElementById('price').value = discountedPrice.toLocaleString();
-            // تحديث الدفعة لو كان خيار 10% مفعل
             if(document.getElementById('btn-down-10').classList.contains('btn-active')) {
                 autoSetDown('10%');
             }
@@ -231,59 +208,42 @@
 
             if (type === '10%') {
                 downInput.value = (price * 0.1).toLocaleString();
-                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-active";
-                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
+                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-active";
+                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
             } else {
                 downInput.value = (100000).toLocaleString();
-                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
-                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-active";
+                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
+                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-active";
             }
             calculate();
         }
 
-        // دالة لإلغاء تحديد أزرار الدفعة الأولى عند المسح أو الكتابة اليدوية
         function clearDownButtons() {
-            document.getElementById('btn-down-10').className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
-            document.getElementById('btn-down-100k').className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
-        }
-
-        function clearAptButtons() {
-            // لو المستخدم عدل السعر يدوي، نلغي الربط مع الشقة المختارة
-            if (currentMode === 'apartment') {
-                // نترك أزرار الـ 100-95 كما هي لكن السعر يدوي
-            }
+            document.getElementById('btn-down-10').className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
+            document.getElementById('btn-down-100k').className = "flex-1 py-2 text-[10px] font-bold rounded-lg border transition-all btn-inactive";
         }
 
         function formatInput(el, isFloat = false) {
             let val = el.value.replace(isFloat ? /[^\d.]/g : /[^\d]/g, '');
             if (val === "") { el.value = ""; calculate(); return; }
             if (!isFloat) el.value = Number(val).toLocaleString('en-US');
-            if (!isFloat && currentMode === 'apartment' && el.id === 'price') baseAptPrice = Number(val) / currentDiscount;
             calculate();
         }
 
         function getCleanVal(id) { return Number(document.getElementById(id).value.replace(/,/g, '')) || 0; }
 
         function calculate() {
-            let p = getCleanVal('price');
-            let d = getCleanVal('down');
-            let e = getCleanVal('earnest');
-            let y = getCleanVal('years');
-            let r = getCleanVal('rate') / 100;
-
+            let p = getCleanVal('price'), d = getCleanVal('down'), e = getCleanVal('earnest'), y = getCleanVal('years'), r = getCleanVal('rate') / 100;
             let loanAmount = Math.max(0, p - d - e);
             let totalInterest = loanAmount * r * y;
             let finalTotal = loanAmount + totalInterest;
             let monthly = (y > 0) ? (finalTotal / (y * 12)) : 0;
-
             const fmt = (n) => Math.max(0, n).toLocaleString('en-US', { maximumFractionDigits: 0 });
-            
             document.getElementById('loan').innerText = fmt(loanAmount);
             document.getElementById('interest').innerText = fmt(totalInterest);
             document.getElementById('total').innerText = fmt(finalTotal);
             document.getElementById('monthly').innerText = fmt(monthly);
         }
-
         setMode('manual');
     </script>
 </body>
