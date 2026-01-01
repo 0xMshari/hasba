@@ -18,6 +18,8 @@
         .active-tab { background-color: #2563eb !important; color: #ffffff !important; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.25); }
         .input-box { @apply bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700; border-width: 1px; border-radius: 16px; padding: 10px 14px; transition: all 0.2s ease; }
         .info-card-blue { @apply bg-blue-50 border-blue-100 dark:bg-blue-900/40 dark:border-blue-500/50; }
+        .btn-inactive { @apply bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300; }
+        .btn-active { @apply bg-blue-600 text-white shadow-md; }
         @media (max-width: 768px) { .app-wrapper { flex-direction: column-reverse; height: auto; border-radius: 0; } }
     </style>
 </head>
@@ -55,8 +57,8 @@
                     </div>
 
                     <div class="flex gap-2">
-                        <button onclick="autoSetDown('10%')" class="flex-1 py-2 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 rounded-lg dark:text-white">دفعة 10%</button>
-                        <button onclick="autoSetDown('100k')" class="flex-1 py-2 text-[10px] font-bold bg-slate-200 dark:bg-slate-700 rounded-lg dark:text-white">100 ألف دفعة</button>
+                        <button onclick="autoSetDown('10%')" id="btn-down-10" class="flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive">دفعة 10%</button>
+                        <button onclick="autoSetDown('100k')" id="btn-down-100k" class="flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive">100 ألف دفعة</button>
                     </div>
                 </div>
 
@@ -64,11 +66,11 @@
                     <label class="text-xs font-bold text-slate-500 mb-1 block" id="price-label">قيمة العقار</label>
                     <div class="flex gap-2 items-center">
                         <div class="input-box flex-1">
-                            <input type="text" id="price" oninput="formatInput(this)" class="w-full font-black text-lg outline-none bg-transparent dark:text-white">
+                            <input type="text" id="price" oninput="formatInput(this); clearAptButtons();" class="w-full font-black text-lg outline-none bg-transparent dark:text-white">
                         </div>
                         <div id="ratio-selector" class="hidden flex flex-col gap-1 shrink-0 animate-in zoom-in duration-200">
-                            <button onclick="setDiscount(1)" id="ltv-100" class="px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white">100%</button>
-                            <button onclick="setDiscount(0.95)" id="ltv-95" class="px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white">95%</button>
+                            <button onclick="setDiscount(1)" id="ltv-100" class="px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white transition-all">100%</button>
+                            <button onclick="setDiscount(0.95)" id="ltv-95" class="px-3 py-1.5 text-[10px] font-black rounded-lg border border-slate-200 dark:border-slate-700 dark:text-white transition-all">95%</button>
                         </div>
                     </div>
                 </div>
@@ -80,7 +82,7 @@
                     </div>
                     <div id="down-box" class="input-box">
                         <label class="text-[10px] font-bold text-slate-500">الدفعة الأولى</label>
-                        <input type="text" id="down" value="0" oninput="formatInput(this)" class="w-full font-bold outline-none bg-transparent dark:text-white">
+                        <input type="text" id="down" value="0" oninput="formatInput(this); clearDownButtons();" class="w-full font-bold outline-none bg-transparent dark:text-white">
                     </div>
                 </div>
 
@@ -99,7 +101,7 @@
 
         <div class="results-area flex-1 p-8 bg-white dark:bg-slate-900 flex flex-col justify-center">
             <div class="mb-10 text-center md:text-right">
-                <span class="inline-block text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full mb-2">القسط الشهري</span>
+                <span class="inline-block text-[10px] font-black text-blue-600 bg-blue-50 dark:bg-blue-900/30 px-4 py-1.5 rounded-full mb-2">القسط الشهري التقريبي</span>
                 <div class="flex items-baseline justify-center md:justify-start gap-2">
                     <span id="monthly" class="text-6xl md:text-8xl font-black text-slate-900 dark:text-white tracking-tighter">0</span>
                     <span class="text-xl text-slate-400 font-bold">ريال</span>
@@ -156,11 +158,8 @@
             const yearsInput = document.getElementById('years');
             const priceLabel = document.getElementById('price-label');
             
-            // إظهار/إخفاء العناصر بناءً على المود
             aptOpt.classList.toggle('hidden', mode !== 'apartment');
             ratioDiv.classList.toggle('hidden', mode !== 'apartment');
-            
-            // تغيير النص التوضيحي للسعر
             priceLabel.innerText = mode === 'apartment' ? 'قيمة العقار (بعد الخصم إن وجد)' : 'قيمة العقار';
 
             ['manual', 'offplan', 'apartment'].forEach(m => {
@@ -176,9 +175,9 @@
             } else {
                 rateInput.readOnly = false;
                 yearsInput.readOnly = false;
-                // إعادة تصفير السعر عند الخروج من مود الشقق لتجنب أخطاء الحساب
                 currentDiscount = 1;
             }
+            clearDownButtons();
             calculate();
         }
 
@@ -217,22 +216,49 @@
         function updatePriceField() {
             const discountedPrice = baseAptPrice * currentDiscount;
             document.getElementById('price').value = discountedPrice.toLocaleString();
+            // تحديث الدفعة لو كان خيار 10% مفعل
+            if(document.getElementById('btn-down-10').classList.contains('btn-active')) {
+                autoSetDown('10%');
+            }
             calculate();
         }
 
         function autoSetDown(type) {
             const price = getCleanVal('price');
             const downInput = document.getElementById('down');
-            if (type === '10%') downInput.value = (price * 0.1).toLocaleString();
-            else downInput.value = (100000).toLocaleString();
+            const btn10 = document.getElementById('btn-down-10');
+            const btn100k = document.getElementById('btn-down-100k');
+
+            if (type === '10%') {
+                downInput.value = (price * 0.1).toLocaleString();
+                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-active";
+                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
+            } else {
+                downInput.value = (100000).toLocaleString();
+                btn10.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
+                btn100k.className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-active";
+            }
             calculate();
+        }
+
+        // دالة لإلغاء تحديد أزرار الدفعة الأولى عند المسح أو الكتابة اليدوية
+        function clearDownButtons() {
+            document.getElementById('btn-down-10').className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
+            document.getElementById('btn-down-100k').className = "flex-1 py-2 text-[10px] font-bold rounded-lg transition-all btn-inactive";
+        }
+
+        function clearAptButtons() {
+            // لو المستخدم عدل السعر يدوي، نلغي الربط مع الشقة المختارة
+            if (currentMode === 'apartment') {
+                // نترك أزرار الـ 100-95 كما هي لكن السعر يدوي
+            }
         }
 
         function formatInput(el, isFloat = false) {
             let val = el.value.replace(isFloat ? /[^\d.]/g : /[^\d]/g, '');
             if (val === "") { el.value = ""; calculate(); return; }
             if (!isFloat) el.value = Number(val).toLocaleString('en-US');
-            if (!isFloat && currentMode === 'apartment') baseAptPrice = Number(val) / currentDiscount;
+            if (!isFloat && currentMode === 'apartment' && el.id === 'price') baseAptPrice = Number(val) / currentDiscount;
             calculate();
         }
 
@@ -245,7 +271,7 @@
             let y = getCleanVal('years');
             let r = getCleanVal('rate') / 100;
 
-            let loanAmount = p - d - e;
+            let loanAmount = Math.max(0, p - d - e);
             let totalInterest = loanAmount * r * y;
             let finalTotal = loanAmount + totalInterest;
             let monthly = (y > 0) ? (finalTotal / (y * 12)) : 0;
